@@ -41,6 +41,7 @@ private:
     int getSize(Node* node) const;
     void update(Node* node);
     int getBalance(Node* node) const;
+    
 
     // Comparison function to determine the ordering of Player objects in the AVL tree
     bool comesBefore(const Player& a, const Player& b) const;
@@ -54,6 +55,7 @@ private:
     Node* insertNode(Node* node, Player player);
     Node* eraseNode(Node* node, Player player);
     Node* findNode(Player player) const;
+    Node* findMin(Node* node) const;
     void destroy(Node* node);
 
 public:
