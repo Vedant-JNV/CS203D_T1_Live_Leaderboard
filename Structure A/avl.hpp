@@ -57,6 +57,7 @@ private:
     Node* findNode(Player player) const;
     Node* findMin(Node* node) const;
     void destroy(Node* node);
+    void rangeNode(Node* node, int a, int b, int baseRank, vector<Player>& result) const;
 
 public:
     AVL_Tree() = default;

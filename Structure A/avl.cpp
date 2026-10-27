@@ -193,3 +193,110 @@ bool AVL_Tree::erase(int id, long score) {
     root = eraseNode(root, {id, score});
     return true;
 }
+
+// Function to select the k-th player in the sorted order and store it in result
+bool AVL_Tree::select(int k, Player& result) const {
+
+
+    // Check if k is within the valid range
+    if (k < 1 || k > getSize(root))
+        return false;
+
+    // Start from the root of the tree
+    Node* current = root;
+
+    while (current) {
+        int leftSize = getSize(current->left);
+
+        // If the k-th player is found, store it in result and return true
+        if (k == leftSize + 1) {
+            result = current->player;
+            return true;
+        }
+        // Move left or right based on the size of the left subtree
+        else if (k <= leftSize) {
+            // If k is less than or equal to the size of the left subtree, move to the left subtree
+            current = current->left;
+        }
+        else {
+            // If k is greater than the size of the left subtree, adjust k and move to the right subtree
+            k -= leftSize + 1;
+            current = current->right;
+        }
+    }
+
+    // If we reach a null pointer, the k-th player is not found
+    return false;
+}
+
+// Function to find the rank of a player with the given id and score, and store it in result
+bool AVL_Tree::rank(int id, long score, int& result) const {
+
+    // If the player is not found in the tree, return false
+    if (!findNode({id, score}))
+        return false;
+
+    // Start from the root of the tree
+    Node* current = root;
+    int count = 0;
+
+    while (current) {
+        // If the current player's score is greater than the target score,
+        // increment the count and move to the right subtree
+        if (current->player.score > score) {
+            count += 1 + getSize(current->left);
+            current = current->right;
+        }
+        else {
+            // move to the left subtree if the current player's score is less than or equal to the target score
+            current = current->left;
+        }
+    }
+
+    // Store the rank of the player in result (1-based index)
+    result = count + 1;
+    return true;
+}
+
+// Function to add in the vector , the players with rank in the range [a, b]
+void AVL_Tree::rangeNode(Node* node, int a, int b,int baseRank, vector<Player>& result) const {
+
+    // If the node is null, there's nothing to process
+    if (!node)
+        return;
+
+    // Calculate the current rank of the node based on the base rank and the size of the left subtree
+    int currentRank = baseRank + getSize(node->left) + 1;
+
+    // Visit left subtree if it may contain requested positions
+    if (a < currentRank)
+        rangeNode(node->left, a, b, baseRank, result);
+
+    // Include current player if its position is in the range
+    if (currentRank >= a && currentRank <= b)
+        result.push_back(node->player);
+
+    // Visit right subtree if it may contain requested positions
+    if (b > currentRank)
+        rangeNode(node->right, a, b, currentRank, result);
+}
+
+// Public function to return a vector of players whose ranks are within the range [a, b]
+vector<AVL_Tree::Player> AVL_Tree::range(int a, int b) const {
+    // Create a vector to store the result
+    vector<Player> result;
+
+    // Check if the range is valid; if not, return an empty vector
+    if (a < 1 || b < a || a > getSize(root))
+        return result;
+
+    // Adjust the upper bound if it exceeds the tree size
+    if (b > getSize(root))
+        b = getSize(root);
+
+    // Call the recursive function to populate the result vector with players in the specified range
+    rangeNode(root, a, b, 0, result);
+
+    // Return the vector containing players whose ranks are within the specified range
+    return result;
+}
