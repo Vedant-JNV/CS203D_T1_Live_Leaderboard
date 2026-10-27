@@ -300,3 +300,27 @@ vector<AVL_Tree::Player> AVL_Tree::range(int a, int b) const {
     // Return the vector containing players whose ranks are within the specified range
     return result;
 }
+
+// Public function to return the size of the AVL tree
+int AVL_Tree::size() const {
+    return getSize(root);
+}
+
+// Public function to return the height of the AVL tree
+int AVL_Tree::height() const {
+    return getHeight(root);
+}
+
+// Recursive function to destroy the AVL tree and free memory
+void AVL_Tree::destroy(Node* node) {
+    if (!node) return;
+
+    destroy(node->left);
+    destroy(node->right);
+    delete node;
+}
+
+// Destructor for the AVL_Tree class; calls destroy to free memory
+AVL_Tree::~AVL_Tree() {
+    destroy(root);
+}
