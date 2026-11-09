@@ -114,7 +114,7 @@ AVL_Tree::Node* AVL_Tree::insertNode(Node* node, Player player) {
 }
 
 // Public insertion function
-void AVL_Tree::insert(int id, long score) {
+void AVL_Tree::insert(long long id, long long score) {
     root = insertNode(root, {id, score});
 }
 
@@ -142,7 +142,7 @@ AVL_Tree::Node* AVL_Tree::findNode(Player player) const {
 }
 
 // Public function to check if a player with the given id and score exists in the tree
-bool AVL_Tree::contains(int id, long score) const {
+bool AVL_Tree::contains(long long id, long long score) const {
 
     return findNode({id, score}) != nullptr;
 }
@@ -186,7 +186,7 @@ AVL_Tree::Node* AVL_Tree::eraseNode(Node* node, Player player) {
 }
 
 // Public function to erase a player with the given id and score from the tree
-bool AVL_Tree::erase(int id, long score) {
+bool AVL_Tree::erase(long long id, long long score) {
     if (!contains(id, score))
         return false;
 
@@ -230,7 +230,7 @@ bool AVL_Tree::select(int k, Player& result) const {
 }
 
 // Function to find the rank of a player with the given id and score, and store it in result
-bool AVL_Tree::rank(int id, long score, int& result) const {
+bool AVL_Tree::rank(long long id, long long score, int& result) const {
 
     // If the player is not found in the tree, return false
     if (!findNode({id, score}))

@@ -12,8 +12,8 @@ class AVL_Tree {
 // Define the Player struct to represent a player with an ID and score
 public:
     struct Player {
-        int id;
-        long score;
+        long long id;
+        long long score;
     };
 
 private:
@@ -59,6 +59,8 @@ private:
     void destroy(Node* node);
     void rangeNode(Node* node, int a, int b, int baseRank, vector<Player>& result) const;
 
+friend struct InvariantChecker;
+
 public:
     AVL_Tree() = default;
     ~AVL_Tree();
@@ -67,14 +69,14 @@ public:
     AVL_Tree& operator=(const AVL_Tree&) = delete;
 
     // Public operations
-    void insert(int id, long score);
-    bool erase(int id, long score);
+    void insert(long long id, long long score);
+    bool erase(long long id, long long score);
     // Check if a player with the given id and score exists in the tree
-    bool contains(int id, long score) const;
+    bool contains(long long id, long long score) const;
     // Select the k-th player in the sorted order and store it in result
     bool select(int k, Player& result) const;
     // Find the rank of a player with the given id and score, and store it in result
-    bool rank(int id, long score, int& result) const;
+    bool rank(long long id, long long score, int& result) const;
 
     // Return a vector of players whose scores are within the range [a, b]
     vector<Player> range(int a, int b) const;

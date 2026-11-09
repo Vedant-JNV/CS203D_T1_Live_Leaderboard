@@ -14,20 +14,20 @@ using leaderboard::BST;
 class PlayerScoreTable {
 private:
     struct Entry {
-        int id;
-        long score;
+        long long id;
+        long long score;
         Entry* next;
-        Entry(int playerId, long playerScore, Entry* nextEntry = nullptr)
+        Entry(long long playerId, long long playerScore, Entry* nextEntry = nullptr)
             : id(playerId), score(playerScore), next(nextEntry) {}
     };
 
     vector<Entry*> buckets;
     size_t count;
 
-    size_t bucketIndex(int id) const {
+    size_t bucketIndex(long long id) const {
         // Convert to unsigned before modulo so negative IDs don't cause a
         // negative bucket index.
-        return static_cast<size_t>(static_cast<unsigned int>(id)) % buckets.size();
+        return static_cast<size_t>(static_cast<unsigned long long>(id)) % buckets.size();
     }
 
 public:
@@ -41,7 +41,7 @@ public:
     PlayerScoreTable(const PlayerScoreTable&) = delete;
     PlayerScoreTable& operator=(const PlayerScoreTable&) = delete;
 
-    bool get(int id, long& scoreOut) const {
+    bool get(long long id, long long& scoreOut) const {
         for (Entry* p = buckets[bucketIndex(id)]; p; p = p->next) {
             if (p->id == id) {
                 scoreOut = p->score;
@@ -51,7 +51,7 @@ public:
         return false;
     }
 
-    void set(int id, long score) {
+    void set(long long id, long long score) {
         size_t index = bucketIndex(id);
         for (Entry* p = buckets[index]; p; p = p->next) {
             if (p->id == id) {
@@ -63,7 +63,7 @@ public:
         ++count;
     }
 
-    bool erase(int id) {
+    bool erase(long long id) {
         size_t index = bucketIndex(id);
         Entry* current = buckets[index];
         Entry* previous = nullptr;
@@ -117,11 +117,11 @@ int main(int argc, char* argv[]) {
     char command;
     while (cin >> command) {
         if (command == 'U') {
-            int id;
-            long score;
+            long long id;
+            long long score;
             if (!(cin >> id >> score)) return 1;
 
-            long oldScore;
+            long long oldScore;
             if (scores.get(id, oldScore)) {
                 if (useAVL) avl.erase(id, oldScore);
                 else bst.erase(id, oldScore);
@@ -133,10 +133,10 @@ int main(int argc, char* argv[]) {
             scores.set(id, score);
         }
         else if (command == 'D') {
-            int id;
+            long long id;
             if (!(cin >> id)) return 1;
 
-            long oldScore;
+            long long oldScore;
             if (scores.get(id, oldScore)) {
                 if (useAVL) avl.erase(id, oldScore);
                 else bst.erase(id, oldScore);
@@ -145,10 +145,10 @@ int main(int argc, char* argv[]) {
             // Deleting an absent ID produces no output.
         }
         else if (command == 'R') {
-            int id;
+            long long id;
             if (!(cin >> id)) return 1;
 
-            long score;
+            long long score;
             if (!scores.get(id, score)) {
                 // The project specification does not define absent-ID output.
                 // Use NOT_FOUND consistently in both modes.
@@ -197,8 +197,8 @@ int main(int argc, char* argv[]) {
                     first = false;
                 }
             } else {
-                vector<int> ids = bst.range(a, b);
-                for (int id : ids) {
+                vector<long long> ids = bst.range(a, b);
+                for (long long id : ids) {
                     if (!first) cout << ' ';
                     cout << id;
                     first = false;

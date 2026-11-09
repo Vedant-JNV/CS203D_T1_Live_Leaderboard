@@ -40,7 +40,7 @@ int BST::height() const {
     return h;
 }
 
-bool BST::contains(int id, long long score) const {
+bool BST::contains(long long id, long long score) const {
     const Node* n = root_;
     while (n) {
         if (n->id == id && n->score == score) return true;
@@ -49,7 +49,7 @@ bool BST::contains(int id, long long score) const {
     return false;
 }
 
-bool BST::insert(int id, long long score) {
+bool BST::insert(long long id, long long score) {
     if (contains(id, score)) return false;  // so sizes are only bumped on a real insert
     Node** link = &root_;
     while (*link) {
@@ -61,7 +61,7 @@ bool BST::insert(int id, long long score) {
     return true;
 }
 
-bool BST::erase(int id, long long score) {
+bool BST::erase(long long id, long long score) {
     if (!contains(id, score)) return false;
 
     // Walk down to the node, shrinking the size of every ancestor.
@@ -98,7 +98,7 @@ bool BST::erase(int id, long long score) {
     return true;
 }
 
-int BST::position(int id, long long score) const {
+int BST::position(long long id, long long score) const {
     const Node* n = root_;
     int count = 0;
     while (n) {
@@ -130,7 +130,7 @@ int BST::rank(long long score) const {
     return higher + 1;
 }
 
-int BST::select(int k) const {
+long long BST::select(int k) const {
     if (k < 1 || k > sz(root_)) return -1;
     const Node* n = root_;
     while (n) {
@@ -147,8 +147,8 @@ int BST::select(int k) const {
     return -1;  // unreachable when sizes are correct
 }
 
-std::vector<int> BST::range(int a, int b) const {
-    std::vector<int> out;
+std::vector<long long> BST::range(int a, int b) const {
+    std::vector<long long> out;
     a = std::max(a, 1);
     b = std::min(b, sz(root_));
     if (a > b) return out;
