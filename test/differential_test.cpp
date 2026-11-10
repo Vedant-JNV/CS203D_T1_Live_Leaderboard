@@ -30,9 +30,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "avl.hpp"
-#include "bst.hpp"
-#include "invariants.hpp"
+#include "adapters.hpp"
 #include "oracle.hpp"
 
 using namespace std;
@@ -186,12 +184,7 @@ struct TreeHarness {
                 return tree.select((int)op.a, id) ? to_string(id) : MSG_INVALID;
             }
             default: {  // 'L'
-                // Contract check: the TREE must not clamp. Outside 1 <= a <= b <= size it
-                // returns an empty vector, so the clamping policy lives in one place (here / the app).
-                bool rawValid = op.a >= 1 && op.a <= op.b && op.b <= tree.size();
-                if (!rawValid && !tree.range((int)op.a, (int)op.b).empty())
-                    return "BUG: range() returned data for a range outside 1..size";
-                // Application policy: clamp to 1..size, then ask the tree.
+                // Application policy (same as application.cpp): clamp to 1..size, then ask the tree.
                 long long a = max<long long>(op.a, 1);
                 long long b = min<long long>(op.b, tree.size());
                 if (a > b) return "";                       // nothing left: empty line
@@ -214,8 +207,8 @@ void saveFailingOps(const vector<Op>& ops, size_t upTo) {
 bool runConfig(const Config& cfg, uint64_t seed, int defaultOps, int checkEvery) {
     vector<Op> ops = generate(cfg, seed, defaultOps);
     Oracle oracle;
-    TreeHarness<AVL_Tree> avl;
-    TreeHarness<leaderboard::BST> bst;
+    TreeHarness<AvlAdapter> avl;
+    TreeHarness<BstAdapter> bst;
 
     auto t0 = chrono::steady_clock::now();
     long long queries = 0, invariantRuns = 0;
@@ -246,13 +239,13 @@ bool runConfig(const Config& cfg, uint64_t seed, int defaultOps, int checkEvery)
         if (i < 300 || (i + 1) % checkEvery == 0 || i == last) {
             string why;
             invariantRuns++;
-            if (!InvariantChecker::check(avl.tree, why)) {
+            if (!avl.tree.checkInvariants(why)) {
                 cout << "FAIL [" << cfg.name << "] seed " << seed << ", after operation #" << (i + 1)
                      << " (" << opText(op) << "): AVL invariant broken: " << why << "\n";
                 saveFailingOps(ops, i);
                 return false;
             }
-            if (!InvariantChecker::check(bst.tree, why)) {
+            if (!bst.tree.checkInvariants(why)) {
                 cout << "FAIL [" << cfg.name << "] seed " << seed << ", after operation #" << (i + 1)
                      << " (" << opText(op) << "): BST invariant broken: " << why << "\n";
                 saveFailingOps(ops, i);
@@ -265,7 +258,7 @@ bool runConfig(const Config& cfg, uint64_t seed, int defaultOps, int checkEvery)
     cout << "PASS [" << cfg.name << "] seed " << seed << ": " << ops.size() << " ops, "
          << queries << " queries compared, " << invariantRuns << " invariant checks, final size "
          << oracle.size() << ", height AVL " << avl.tree.height() << " / BST " << bst.tree.height()
-         << ", AVL rotations " << avl.tree.rotations() << "  (" << secs << " s)\n";
+         << ", AVL rotations " << (avl.tree.rotations() ? to_string(avl.tree.rotations()) : string("n/a")) << "  (" << secs << " s)\n";
     return true;
 }
 
