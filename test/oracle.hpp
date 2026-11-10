@@ -10,7 +10,7 @@
 
 // Output texts for situations the spec does not define (agree with the team).
 inline const std::string MSG_NOT_FOUND = "NOT_FOUND";  // R for an id that does not exist
-inline const std::string MSG_INVALID   = "INVALID";    // S with a position out of range
+inline const std::string MSG_INVALID   = "-1";         // S with a position out of range (same as application.cpp / README)
 
 class Oracle {
     struct Entry { PlayerId id; Score score; };
