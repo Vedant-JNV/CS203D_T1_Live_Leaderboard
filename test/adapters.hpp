@@ -1,0 +1,82 @@
+// adapters.hpp -- makes the teammates' two trees look the same to the tester.
+// Owner: Test owner.
+//
+// The trees have slightly different function signatures (AVL: rank(id,score,int&),
+// select(k,Player&), range -> vector<Player>; BST: rank(score), select(k) -> -1 when
+// out of range, range -> vector<long long>, and range() clamps).  Instead of asking
+// anyone to change working code, each adapter wraps one tree and offers:
+//
+//     void insert(id, score)           bool erase(id, score)
+//     int  rank(id, score)  // 0 if absent
+//     bool select(k, id&)   // false if k outside 1..size
+//     vector<PlayerId> range(a, b)  // empty unless 1 <= a <= b <= size
+//     int size()  int height()  long long rotations()
+//     bool checkInvariants(why)
+//
+// The adapters add no logic of their own about ordering or ranks; they only translate.
+#pragma once
+
+#include <string>
+#include <vector>
+
+#include "types.hpp"
+#include "avl.hpp"
+#include "bst.hpp"
+#include "invariant.hpp"
+
+class AvlAdapter {
+public:
+    AVL_Tree impl;
+
+    void insert(PlayerId id, Score score) { impl.insert(id, score); }
+    bool erase(PlayerId id, Score score)  { return impl.erase(id, score); }
+
+    int rank(PlayerId id, Score score) const {
+        int r = 0;
+        return impl.rank(id, score, r) ? r : 0;
+    }
+    bool select(int k, PlayerId& out) const {
+        AVL_Tree::Player p;
+        if (!impl.select(k, p)) return false;
+        out = p.id;
+        return true;
+    }
+    std::vector<PlayerId> range(int a, int b) const {
+        std::vector<PlayerId> ids;
+        if (a < 1 || b < a || b > impl.size()) return ids;     // strict, see note above
+        for (const AVL_Tree::Player& p : impl.range(a, b)) ids.push_back(p.id);
+        return ids;
+    }
+    int size() const   { return impl.size(); }
+    int height() const { return impl.height(); }
+    long long rotations() const { return 0; }                   // the AVL has no counter (yet)
+
+    bool checkInvariants(std::string& why) const { return ::InvariantChecker::check(impl, why); }
+};
+
+class BstAdapter {
+public:
+    leaderboard::BST impl;
+
+    void insert(PlayerId id, Score score) { impl.insert(id, score); }
+    bool erase(PlayerId id, Score score)  { return impl.erase(id, score); }
+
+    int rank(PlayerId id, Score score) const {
+        if (!impl.contains(id, score)) return 0;                // BST::rank only takes the score
+        return impl.rank(score);
+    }
+    bool select(int k, PlayerId& out) const {
+        if (k < 1 || k > impl.size()) return false;             // BST::select returns -1 otherwise
+        out = impl.select(k);
+        return true;
+    }
+    std::vector<PlayerId> range(int a, int b) const {
+        if (a < 1 || b < a || b > impl.size()) return {};       // BST::range would clamp; stay strict
+        return impl.range(a, b);
+    }
+    int size() const   { return impl.size(); }
+    int height() const { return impl.height(); }
+    long long rotations() const { return 0; }                   // no rotations in a plain BST
+
+    bool checkInvariants(std::string& why) const { return leaderboard::InvariantChecker::check(impl, why); }
+};
