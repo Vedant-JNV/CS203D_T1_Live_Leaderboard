@@ -279,7 +279,9 @@ int main(int argc, char** argv) {
         else if (arg == "--check-every") checkEvery = max(1, stoi(next()));
         else if (arg == "--only") only = next();
         else if (arg == "--emit") emitFile = next();
-        else { cerr << "unknown option " << arg << "\n"; return 2; }
+        else if (arg.rfind("--", 0) == 0) { cerr << "unknown option " << arg << "\n"; return 2; }
+        // else: a stray word that is not an option (some Windows shells pass the program's own
+        // path as an extra argument when the folder name has spaces) -- ignore it.
     }
 
     vector<Config> configs = allConfigs();
@@ -301,3 +303,4 @@ int main(int argc, char** argv) {
     cout << (allOk ? "ALL PASSED\n" : "SOME TESTS FAILED\n");
     return allOk ? 0 : 1;
 }
+
