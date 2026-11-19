@@ -1,6 +1,6 @@
 # CS 203D Mini-Project 1: Live Leaderboard with Rank Queries
 
-**Project 1 — Size-Augmented AVL Tree vs Unbalanced Binary Search Tree**
+**Project 1 - Size-Augmented AVL Tree vs Unbalanced Binary Search Tree**
 
 A leaderboard system that maintains player scores and efficiently supports rank queries, positional selection, and range listing. This project compares a self-balancing AVL tree with an ordinary unbalanced Binary Search Tree (BST), both augmented with subtree sizes.
 
@@ -10,8 +10,8 @@ A leaderboard system that maintains player scores and efficiently supports rank 
 
 | Member | Role | Analysis Question |
 |---|---|---|
-| Vedant | Structure A — AVL Tree | Q1 |
-| Somya | Structure B — BST | Q2 |
+| Vedant | Structure A - AVL Tree | Q1 |
+| Somya | Structure B - BST | Q2 |
 | Imran | Application and Interface | Q3 |
 | Swarnika | Testing, Oracle and Invariant Checker | Q4 |
 | Aarushi | Measurement and Benchmarking | Q5 |
@@ -205,7 +205,7 @@ L 1 4
 
 ## 7. Data Structures and Operations
 
-### Structure A — AVL Tree
+### Structure A - AVL Tree
 
 The AVL tree is a self-balancing Binary Search Tree. Each node stores player information, subtree size, and height.
 
@@ -223,7 +223,7 @@ The subtree sizes allow rank and select queries to be performed without traversi
 
 Here, `k` is the number of players returned in the range.
 
-### Structure B — Unbalanced BST
+### Structure B - Unbalanced BST
 
 The ordinary BST uses the same ordering and subtree-size augmentation as Structure A, but does not perform rotations or maintain balance.
 
@@ -352,9 +352,9 @@ The benchmark may take a significant amount of time, especially for the 100,000-
 
 ### Benchmark Outputs
 
-- `results/benchmark_raw.csv` — raw measurements from individual runs.
-- `results/benchmark_raw_summary.csv` — average and sample standard deviation across runs.
-- `results/benchmark_raw_figures/` — generated plots for insertion time, rank time, select time, tree height, and AVL rotations.
+- `results/benchmark_raw.csv` - raw measurements from individual runs.
+- `results/benchmark_raw_summary.csv` - average and sample standard deviation across runs.
+- `results/benchmark_raw_figures/` - generated plots for insertion time, rank time, select time, tree height, and AVL rotations.
 
 Detailed methodology, figures, and performance analysis are available in `bench/report.md`.
 

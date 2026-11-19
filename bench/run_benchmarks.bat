@@ -1,3 +1,4 @@
+
 @echo off
 setlocal
 
@@ -11,7 +12,24 @@ if errorlevel 1 (
 
 if not exist "results" mkdir "results"
 
- echo [1/3] Compiling benchmark...
+echo [0/3] Cleaning previous benchmark executable...
+
+REM Stop any leftover benchmark process
+taskkill /F /IM benchmark.exe >nul 2>&1
+
+REM Remove old executable before linking
+if exist "bench\benchmark.exe" (
+    del /F "bench\benchmark.exe" >nul 2>&1
+)
+
+REM Verify it was removed
+if exist "bench\benchmark.exe" (
+    echo ERROR: benchmark.exe is still locked.
+    echo Close any process using it and retry.
+    goto :error
+)
+
+echo [1/3] Compiling benchmark...
 g++ -std=c++17 -O2 -DNDEBUG -Wall -Wextra ^
   "bench\benchmark.cpp" ^
   "Structure A\avl.cpp" ^
@@ -19,7 +37,7 @@ g++ -std=c++17 -O2 -DNDEBUG -Wall -Wextra ^
   -o "bench\benchmark.exe"
 if errorlevel 1 goto :error
 
- echo [2/3] Running benchmark...
+echo [2/3] Running benchmark...
 "bench\benchmark.exe" "%ROOT%\results\benchmark_raw.csv"
 if errorlevel 1 goto :error
 
@@ -28,7 +46,7 @@ if not exist "results\benchmark_raw.csv" (
     goto :error
 )
 
- echo [3/3] Generating plots...
+echo [3/3] Generating plots...
 python "bench\plot_results.py" "%ROOT%\results\benchmark_raw.csv"
 if errorlevel 1 goto :error
 
