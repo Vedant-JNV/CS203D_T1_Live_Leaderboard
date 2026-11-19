@@ -1,53 +1,401 @@
-#  Live_leaderboard
- Live leaderboard  with rank queries
-## Application (leaderboard program)
+# CS 203D Mini-Project 1: Live Leaderboard with Rank Queries
 
-`application.cpp` replays an operation file against either tree:
-- `--structure A` uses the AVL tree (`Structure A/avl.cpp`)
-- `--structure B` uses the unbalanced BST (`Structure B/bst.cpp`)
+**Project 1 — Size-Augmented AVL Tree vs Unbalanced Binary Search Tree**
 
-Both structures must print identical output. A custom separate-chaining hash
-table (player id -> current score) is built into `application.cpp`.
+A leaderboard system that maintains player scores and efficiently supports rank queries, positional selection, and range listing. This project compares a self-balancing AVL tree with an ordinary unbalanced Binary Search Tree (BST), both augmented with subtree sizes.
 
-### Requirements
-A C++17 compiler (`g++`). On Windows, install MSYS2/MinGW-w64 and add it to PATH.
+**Team Name:** [Enter Team Name]
 
-### Build (run from the repo root)
-```
-g++ -std=c++17 -O2 -I"Structure A" -I"Structure B" application.cpp "Structure A/avl.cpp" "Structure B/bst.cpp" -o leaderboard
-```
-This produces `leaderboard.exe` on Windows and `leaderboard` on Linux/Mac.
+## Team Members and Roles
 
-### Run
-Windows PowerShell:
-```
-Get-Content ops.txt | .\leaderboard.exe --structure A
-Get-Content ops.txt | .\leaderboard.exe --structure B
-```
-Linux / Mac / Git Bash:
-```
-./leaderboard --structure A < ops.txt
-./leaderboard --structure B < ops.txt
+| Member | Role | Analysis Question |
+|---|---|---|
+| Vedant | Structure A — AVL Tree | Q1 |
+| Somya | Structure B — BST | Q2 |
+| Imran | Application and Interface | Q3 |
+| Swarnika | Testing, Oracle and Invariant Checker | Q4 |
+| Aarushi | Measurement and Benchmarking | Q5 |
+
+*Roll numbers and GitHub usernames should be added as required.*
+
+---
+
+## 1. Project Overview
+
+The project implements a live leaderboard for an online game where player scores are continuously updated. The leaderboard must efficiently answer queries such as:
+
+- Finding the rank of a particular player.
+- Finding the player at a given position.
+- Listing players within a given range of positions.
+- Updating or removing players.
+
+Two data structures are implemented and compared:
+
+- **Structure A:** Size-augmented AVL Tree, which maintains balance using rotations.
+- **Structure B:** Size-augmented unbalanced Binary Search Tree, which does not perform balancing.
+
+Both structures use the same ordering rules and support the same leaderboard operations.
+
+### Ordering Rules
+
+Players are ordered by:
+
+1. Higher score first.
+2. For equal scores, lower player ID first.
+
+Players with equal scores receive the same competition rank. The next rank is skipped accordingly.
+
+For example, if the scores are:
+
+| Player ID | Score | Rank |
+|---:|---:|---:|
+| 1 | 100 | 1 |
+| 2 | 90 | 2 |
+| 3 | 90 | 2 |
+| 4 | 80 | 4 |
+
+The ranks follow competition ranking: **1, 2, 2, 4**.
+
+---
+
+## 2. Project Structure
+
+```text
+Live_leaderboard/
+│
+├── application.cpp
+├── ops.txt
+│
+├── Structure A/
+│   ├── avl.cpp
+│   ├── avl.hpp
+│   └── test.cpp
+│
+├── Structure B/
+│   ├── bst.cpp
+│   └── bst.hpp
+│
+├── test/
+│   ├── oracle.cpp
+│   ├── oracle.hpp
+│   ├── adapters.hpp
+│   ├── invariant.hpp
+│   ├── differential_test.cpp
+│   ├── rotation_sim.hpp
+│   ├── types.hpp
+│   └── worst_case.cpp
+│
+├── bench/
+│   ├── benchmark.cpp
+│   ├── plot_results.py
+│   ├── report.md
+│   ├── README.md
+│   ├── run_benchmarks.sh
+│   └── run_benchmarks.bat
+│
+└── results/
+    ├── benchmark_raw.csv
+    └── benchmark_raw_figures/
 ```
 
-### Input format (one command per line)
-| Command | Meaning |
+---
+
+## 3. Requirements
+
+- **Language:** C++
+- **Standard:** C++17
+- **Compiler:** g++ (MinGW-w64/MSYS2 on Windows, or GCC on Linux)
+- **Python:** Python 3 for plotting benchmark results
+- **Python package:** matplotlib
+
+On Windows, a MinGW-w64 installation with `g++` added to PATH is recommended.
+
+Install the plotting dependency using:
+
+```bash
+python -m pip install matplotlib
+```
+
+---
+
+## 4. Building the Application
+
+Run the following command from the project root directory:
+
+```bash
+g++ -std=c++17 -O2 -I"Structure A" -I"Structure B" application.cpp "Structure A/avl.cpp" "Structure B/bst.cpp" -o run.exe
+```
+
+This builds the leaderboard application and produces `run.exe` on Windows.
+
+---
+
+## 5. Running the Application
+
+The application reads operations from standard input and prints the result of each query to standard output.
+
+### Windows PowerShell
+
+Run Structure A (AVL):
+
+```powershell
+Get-Content ops.txt | .\run.exe --structure A
+```
+
+Run Structure B (BST):
+
+```powershell
+Get-Content ops.txt | .\run.exe --structure B
+```
+
+### Linux / macOS / Git Bash
+
+Run Structure A:
+
+```bash
+./run --structure A < ops.txt
+```
+
+Run Structure B:
+
+```bash
+./run --structure B < ops.txt
+```
+
+Both structures are expected to produce identical outputs for the same supported input.
+
+---
+
+## 6. Input Format
+
+Each operation is supplied on a separate line.
+
+| Command | Description |
 |---|---|
-| `U <id> <score>` | set a player's score (adds the player if new) |
-| `R <id>` | print the player's rank (ties share a rank: 1, 2, 2, 4); `NOT_FOUND` if absent |
-| `S <k>` | print the id at position k (1 = top); `-1` if out of range |
-| `L <a> <b>` | print the ids at positions a..b, space-separated (clamped to valid range) |
-| `D <id>` | remove the player (no output if absent) |
+| `U <id> <score>` | Insert a new player or update an existing player's score. |
+| `R <id>` | Print the player's rank. Prints `NOT_FOUND` if the player does not exist. |
+| `S <k>` | Print the player ID at position `k`, where 1 represents the top position. Prints `-1` if out of range. |
+| `L <a> <b>` | Print the player IDs occupying positions `a` through `b`, separated by spaces. The range is clamped to valid positions. |
+| `D <id>` | Delete the player. If the player does not exist, no output is produced. |
 
-### Expected output for the sample `ops.txt`
+### Example Input
+
+```text
+U 1 100
+U 2 90
+U 3 90
+U 4 80
+R 3
+S 2
+L 1 4
+D 2
+L 1 4
 ```
+
+### Expected Output
+
+```text
 2
 2
 1 2 3 4
 1 3 4
 ```
-Running with `--structure A` and `--structure B` must give exactly this.
 
-### Notes
-- Ordering: higher score first; ties by lower player id.
-- Sorted-order input makes Structure B a long chain, so it is much slower than A on large inputs (this is expected).
+---
+
+## 7. Data Structures and Operations
+
+### Structure A — AVL Tree
+
+The AVL tree is a self-balancing Binary Search Tree. Each node stores player information, subtree size, and height.
+
+After insertion or deletion, rotations are performed when necessary to maintain the AVL balance condition.
+
+The subtree sizes allow rank and select queries to be performed without traversing the entire tree.
+
+| Operation | Complexity |
+|---|---|
+| Insert | O(log n) |
+| Delete | O(log n) |
+| Rank | O(log n) |
+| Select | O(log n) |
+| Range listing | O(log n + k) approximately |
+
+Here, `k` is the number of players returned in the range.
+
+### Structure B — Unbalanced BST
+
+The ordinary BST uses the same ordering and subtree-size augmentation as Structure A, but does not perform rotations or maintain balance.
+
+Its performance depends on the order in which elements are inserted. In an unfavourable insertion order, the tree can become a chain.
+
+| Operation | Average / expected | Worst case |
+|---|---|---|
+| Insert | O(h) | O(n) |
+| Delete | O(h) | O(n) |
+| Rank | O(h) | O(n) |
+| Select | O(h) | O(n) |
+
+Here, `h` is the height of the tree. In a reasonably balanced tree, h is logarithmic, but it can reach n in the worst case.
+
+### Application and Hash Table
+
+The application provides a common interface to both trees and replays the input operations.
+
+A custom hash table using separate chaining stores player IDs and their current scores. When a player's score is updated, their previous entry is removed from the tree and the updated entry is inserted.
+
+The hash table provides average O(1) player lookup, while the trees maintain the leaderboard ordering and support rank-based operations.
+
+---
+
+## 8. Testing
+
+Testing is performed using a reference oracle, differential testing, and invariant checking.
+
+### Reference Oracle
+
+A sorted array-based reference implementation is used to verify expected results. It provides a simpler correctness model, with linear-time updates.
+
+### Differential Testing
+
+Randomly generated operations are executed against:
+
+- The reference oracle.
+- Structure A (AVL Tree).
+- Structure B (unbalanced BST).
+
+The outputs are compared to identify any discrepancies.
+
+The test supports configurable operation counts, seeds, test configurations, and invariant-checking frequency.
+
+Build the differential test from the project root:
+
+```bash
+g++ -std=c++17 -O2 -I"Structure A" -I"Structure B" test/differential_test.cpp "Structure A/avl.cpp" "Structure B/bst.cpp" -o difftest.exe
+```
+
+Run the test:
+
+```powershell
+.\difftest.exe
+```
+
+Example custom configurations:
+
+```powershell
+.\difftest.exe --only ties --ops 100000 --check-every 500
+```
+
+```powershell
+.\difftest.exe --seed 7 --ops 200000
+```
+
+### Invariant Checker
+
+The invariant checker verifies:
+
+- Correct BST ordering.
+- Correct subtree sizes.
+- Correct stored heights in the AVL Tree.
+- Valid AVL balance factors (−1, 0, or 1).
+- Structural correctness of the trees after operations.
+
+### Worst-Case Testing
+
+Additional tests examine unfavourable insertion orders and tree behaviour, including the degeneration of the unbalanced BST under sorted insertions.
+
+---
+
+## 9. Benchmarking
+
+The benchmark compares AVL and BST performance for random and sorted insertion sequences.
+
+### Experimental Parameters
+
+- Input sizes: 1,000; 5,000; 10,000; 25,000; 50,000; and 100,000 players.
+- Five runs per configuration.
+- Random and sorted insertion orders.
+- Recorded random seeds.
+- 200 rank queries and 200 select queries per run after tree construction.
+
+### Metrics
+
+- Total insertion time.
+- Average insertion time per player (ns).
+- Average rank query time (ns).
+- Average select query time (ns).
+- Final tree height.
+- Total AVL rotations.
+- AVL rotations per insertion.
+
+### Running the Benchmark
+
+#### Linux / macOS / Git Bash
+
+From the project root:
+
+```bash
+bash bench/run_benchmarks.sh
+```
+
+#### Windows
+
+From PowerShell or Command Prompt:
+
+```powershell
+bench\run_benchmarks.bat
+```
+
+The benchmark script compiles the benchmark program, runs the experiments, generates the raw CSV results, and creates plots.
+
+The benchmark may take a significant amount of time, especially for the 100,000-element sorted-input BST, which can degenerate into a chain.
+
+### Benchmark Outputs
+
+- `results/benchmark_raw.csv` — raw measurements from individual runs.
+- `results/benchmark_raw_summary.csv` — average and sample standard deviation across runs.
+- `results/benchmark_raw_figures/` — generated plots for insertion time, rank time, select time, tree height, and AVL rotations.
+
+Detailed methodology, figures, and performance analysis are available in `bench/report.md`.
+
+---
+
+## 10. Benchmark Interpretation
+
+The AVL tree maintains logarithmic height through balancing, while the unbalanced BST depends on insertion order.
+
+For random insertion, the ordinary BST can perform reasonably well, although it is not guaranteed to remain balanced.
+
+For sorted insertion, the BST can degenerate into a chain of height n, causing insertion and query performance to deteriorate significantly. The AVL tree avoids this by maintaining balance through rotations.
+
+The benchmark also measures the additional work associated with AVL rotations and compares the observed performance against the expected complexity of both structures.
+
+Benchmark results are hardware-dependent and should be interpreted alongside the raw measurements and figures.
+
+---
+
+## 11. Known Limitations
+
+- The unbalanced BST can have O(n) height and O(n) individual operation time under unfavourable insertion orders.
+- Sorted BST construction can take O(n²) total time and becomes very slow at large input sizes.
+- Benchmark timings depend on hardware, compiler, optimization settings, and system load.
+- Random insertion does not guarantee a balanced BST.
+- The benchmark focuses on insertion, rank, select, height, and AVL rotations; it is not a complete real-world game server performance simulation.
+- Range listing can take time proportional to the number of players returned, in addition to tree traversal overhead.
+- Both structures are designed for the project requirements and are not intended to provide concurrent/thread-safe updates.
+
+---
+
+## 12. References
+
+- Adelson-Velsky, G. M., and Landis, E. M. “An algorithm for the organization of information.” *Soviet Mathematics Doklady*, 3, 1259–1263, 1962.
+- Cormen, T. H., Leiserson, C. E., Rivest, R. L., and Stein, C. *Introduction to Algorithms*, 3rd ed., MIT Press, 2009. Chapters 12, 13, and §14.1.
+- Sedgewick, R., and Wayne, K. *Algorithms*, 4th ed., Addison-Wesley, 2011. §3.2.
+
+---
+
+## 13. AI and Tool Usage
+
+AI tools were used for assistance with documentation, explanations, code review, debugging, and test/benchmark interpretation. The project implementation was reviewed and modified by the team, and team members are responsible for understanding and explaining their own code and design decisions.
+
+See `TOOLS.md` for the detailed tool-use declaration.

@@ -163,7 +163,6 @@ AVL_Tree::Node *AVL_Tree::findNode(Player player) const
 // Public function to check if a player with the given id and score exists in the tree
 bool AVL_Tree::contains(long long id, long long score) const
 {
-
     return findNode({id, score}) != nullptr;
 }
 

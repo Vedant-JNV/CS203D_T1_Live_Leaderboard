@@ -49,7 +49,7 @@ public:
     }
     int size() const   { return impl.size(); }
     int height() const { return impl.height(); }
-    long long rotations() const { return 0; }                   // the AVL has no counter (yet)
+    long long rotations() const { return static_cast<long long>(impl.getRotationCount()); }
 
     bool checkInvariants(std::string& why) const { return ::InvariantChecker::check(impl, why); }
 };
