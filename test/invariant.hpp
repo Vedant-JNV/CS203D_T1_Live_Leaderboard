@@ -1,28 +1,3 @@
-// invariant.hpp -- invariant checker for the AVL tree and the unbalanced BST.
-// Owner: Test owner.
-//
-// It walks the tree through private pointers (each class declares
-// `friend struct InvariantChecker;`) and never trusts the tree's own bookkeeping:
-// it recomputes what it can and compares with what the tree stored.
-//
-// Note on names: avl.hpp declares the friend in the global namespace, bst.hpp declares
-// it inside `namespace leaderboard`, so there are two checkers:
-//     ::InvariantChecker              (for AVL_Tree)
-//     leaderboard::InvariantChecker   (for leaderboard::BST)
-// Both use the same checking code (invariant_core::run below).
-//
-// Everything is iterative so a 100,000-node chain (sorted arrival in the BST)
-// cannot overflow the stack.
-//
-// Conditions checked (the list for Q4):
-//   1. Order:   in-order sequence is strictly increasing in (score desc, id asc).
-//   2. Unique:  no player id appears twice.
-//   3. Sizes:   stored size == 1 + size(left) + size(right) at every node.
-//   4. Count:   number of nodes found by walking == size() reported by the tree.
-//   5. Height:  height() reported by the tree == real height found by walking.
-//   AVL only:
-//   6. Stored heights: stored height == 1 + max(height(left), height(right)).
-//   7. Balance: |height(left) - height(right)| <= 1 at every node.
 #pragma once
 
 #include <algorithm>
@@ -35,9 +10,7 @@
 #include "avl.hpp"
 #include "bst.hpp"
 
-// ---------------------------------------------------------------------------
-// The shared checking code. V is a "view" that knows how to read one tree's nodes.
-// ---------------------------------------------------------------------------
+
 namespace invariant_core {
 
 inline bool before(Score s1, PlayerId i1, Score s2, PlayerId i2) {
@@ -164,9 +137,7 @@ struct InvariantChecker {
     }
 };
 
-// ---------------------------------------------------------------------------
-// Checker for the BST: the friend named in bst.hpp lives in namespace leaderboard.
-// ---------------------------------------------------------------------------
+
 namespace leaderboard {
 struct InvariantChecker {
     struct View {

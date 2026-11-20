@@ -1,12 +1,3 @@
-// rotation_sim.hpp -- a tiny, separate AVL tree that only counts rotations.
-// Owner: Test owner.
-//
-// Why a separate tree?  The generator needs to know how many rotations an insertion
-// order causes.  This sim has no ranks, no sizes, no players: just int keys, heights
-// and the standard AVL rebalancing, so it is short enough to read in a minute.
-//
-// Counting rule (the same one we ask the AVL owner to use):
-//   a single rotation counts 1, a double rotation counts 2 (it is two single ones).
 #pragma once
 
 #include <algorithm>

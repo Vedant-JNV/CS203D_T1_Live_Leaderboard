@@ -415,7 +415,6 @@ Sorted BST insertion is quadratic in n and can take substantially longer at 100,
 <<<<<<< HEAD
 - `results/team_original_run/` - an earlier benchmark run by the team on different hardware, used for comparison in the report.
 =======
->>>>>>> 7cc6afcb87564b55a3c903e0a7663221f6cec80e
 
 ---
 

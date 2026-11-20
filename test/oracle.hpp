@@ -1,7 +1,3 @@
-// oracle.hpp -- Project 1 oracle: a sorted vector, linear-time updates.
-// No trees, no hash tables. Deliberately simple so it is obviously correct.
-//
-// Vector order: highest score first; equal scores -> smaller id first.
 #pragma once
 
 #include <string>

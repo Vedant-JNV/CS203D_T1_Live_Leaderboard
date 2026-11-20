@@ -1,23 +1,3 @@
-// differential_test.cpp -- Project 1 differential test.  Owner: Test owner.
-//
-// Runs the SAME random operation list against
-//     (1) the oracle (sorted vector),  (2) the AVL tree,  (3) the unbalanced BST
-// and compares what each one would print, line by line.  It also runs the
-// invariant checker on both trees while the test is running.
-//
-// The tree side imitates the application: a hash map id -> current score
-// (std::unordered_map is allowed in tests), and U = erase old entry + insert new.
-//
-// Usage:
-//   ./difftest                          run every configuration, default seed
-//   ./difftest --seed 7 --ops 200000    other seed / more operations
-//   ./difftest --check-every 1          run invariants after EVERY op (slow, thorough)
-//   ./difftest --only ties              run one configuration
-//   ./difftest --emit ops.txt --only ties    just write that configuration's ops file
-//                                       (use it to test the real ./run binary end to end)
-//
-// Exit code: 0 = all passed, 1 = a mismatch or invariant failure.
-
 #include <algorithm>
 #include <chrono>
 #include <cstdint>

@@ -1,6 +1,3 @@
-// oracle.cpp -- stand-alone oracle: reads operations from stdin, prints query answers.
-// Build:  g++ -std=c++17 -O2 -Wall -o oracle oracle.cpp   (run from this folder)
-// Run:    ./oracle < ops.txt
 #include <iostream>
 #include "oracle.hpp"
 using namespace std;

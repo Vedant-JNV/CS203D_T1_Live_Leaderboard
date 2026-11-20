@@ -50,6 +50,12 @@ AI assistance was used in the following areas:
 - Assistance with preparing the report.
 - Assistance with explanations of design choices and limitations.
 
+### GUI development
+
+- The GUI was developed completely using AI.
+- The GUI does not replace the C++ data structures.
+- It acts as a graphical interface to the existing application, testing, and benchmarking components.
+
 ## 3. Responsibility and Verification
 
 AI-generated suggestions were treated as assistance and not as automatically correct solutions.

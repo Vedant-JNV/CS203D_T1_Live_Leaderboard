@@ -1,25 +1,3 @@
-// worst_case.cpp -- builds insertion orders for the leaderboard and counts the AVL
-// rotations each one causes.  Owner: Test owner.
-//
-// Usage:
-//   ./worstcase --table --n 100000                    table of every order (for the report)
-//   ./worstcase --order triples --n 100000 --out triples.txt
-//   ./worstcase --order random --n 100000 --seed 7 --out random.txt
-//
-// Orders (keys are 1..n, each used once):
-//   sorted    1, 2, 3, ...                         the chain-maker for the plain BST
-//   reverse   n, n-1, ...
-//   random    a shuffle (needs --seed)
-//   balanced  middle first, then the middles of each half, ...   BEST case: 0 rotations
-//   zigzag    1, n, 2, n-1, 3, n-2, ...            outside-in
-//   triples   3 2 1  6 5 4  9 8 7 ...              every group of three, backwards
-//   block7    4 2 1 7 5 3 6  then the same shape shifted by 7, ...  most rotations I found
-//
-// The output file has one line per player: "U <key> <key>" (id = score = key), so every
-// score is different.  The tree orders players from the highest score down, which is the
-// mirror image of an ascending tree; a mirror image needs exactly the same rotations.
-// You can append R / S / L / D lines to the file by hand if you want queries as well.
-
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
