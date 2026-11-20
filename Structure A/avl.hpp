@@ -80,8 +80,10 @@ public:
     bool contains(long long id, long long score) const;
     // Select the k-th player in the sorted order and store it in result
     bool select(int k, Player &result) const;
-    // Find the rank of a player with the given id and score, and store it in result
-    bool rank(long long id, long long score, int &result) const;
+    // Competition rank for a score: 1 + number of players with a strictly higher score.
+    // Single root-to-leaf walk. It does not check that a player with this score exists
+    // (the caller, e.g. the application's hash table, is expected to have done that).
+    int rank(long long score) const;
 
     // Return a vector of players whose scores are within the range [a, b]
     vector<Player> range(int a, int b) const;

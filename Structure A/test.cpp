@@ -6,7 +6,6 @@
 int main() {
     AVL_Tree tree;
     AVL_Tree::Player p;
-    int r;
 
     // Test empty tree
     assert(tree.size() == 0);
@@ -45,11 +44,13 @@ int main() {
     assert(!tree.select(5, p));
 
     // Test competition ranking
-    assert(tree.rank(1, 100, r) && r == 1);
-    assert(tree.rank(2, 90, r) && r == 2);
-    assert(tree.rank(3, 90, r) && r == 2);
-    assert(tree.rank(4, 80, r) && r == 4);
-    assert(!tree.rank(99, 50, r));
+    assert(tree.rank(100) == 1);
+    assert(tree.rank(90) == 2);          // both tied players share rank 2
+    assert(tree.rank(80) == 4);          // rank 3 is skipped
+    assert(tree.rank(95) == 2);          // a score between players: 1 higher
+    assert(tree.rank(200) == 1);         // above everyone
+    assert(tree.rank(0) == 5);           // below everyone
+    assert(!tree.contains(99, 50));      // absent player
 
     // Test range(): positions 2 through 3, inclusive
     std::vector<AVL_Tree::Player> players = tree.range(2, 3);
@@ -85,8 +86,8 @@ int main() {
     assert(tree.erase(3, 90));
     assert(tree.size() == 2);
 
-    assert(tree.rank(2, 90, r) && r == 1);
-    assert(tree.rank(4, 80, r) && r == 2);
+    assert(tree.rank(90) == 1);
+    assert(tree.rank(80) == 2);
 
     // Delete all remaining players
     assert(tree.erase(2, 90));

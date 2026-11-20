@@ -156,13 +156,10 @@ int main(int argc, char* argv[]) {
                 continue;
             }
 
-            int rank = 0;
-            if (useAVL) {
-                if (avl.rank(id, score, rank)) cout << rank << '\n';
-                else cout << "NOT_FOUND\n";
-            } else {
-                cout << bst.rank(score) << '\n';
-            }
+            // The hash table has already confirmed the player exists, so both trees
+            // answer with a single score-only walk.
+            if (useAVL) cout << avl.rank(score) << '\n';
+            else cout << bst.rank(score) << '\n';
         }
         else if (command == 'S') {
             int k;

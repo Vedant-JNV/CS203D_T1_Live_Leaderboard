@@ -260,22 +260,17 @@ bool AVL_Tree::select(int k, Player &result) const
     return false;
 }
 
-// Function to find the rank of a player with the given id and score, and store it in result
-bool AVL_Tree::rank(long long id, long long score, int &result) const
+// Competition rank for a score: 1 + number of players with a strictly higher score.
+// One root-to-leaf walk; the player's id is not needed because equal scores share a rank.
+int AVL_Tree::rank(long long score) const
 {
-
-    // If the player is not found in the tree, return false
-    if (!findNode({id, score}))
-        return false;
-
-    // Start from the root of the tree
     Node *current = root;
     int count = 0;
 
     while (current)
     {
-        // If the current player's score is greater than the target score,
-        // increment the count and move to the right subtree
+        // The current node and its whole left subtree all have scores >= current's score,
+        // so if current's score is strictly greater, they all count; continue to the right.
         if (current->player.score > score)
         {
             count += 1 + getSize(current->left);
@@ -283,14 +278,12 @@ bool AVL_Tree::rank(long long id, long long score, int &result) const
         }
         else
         {
-            // move to the left subtree if the current player's score is less than or equal to the target score
+            // Current score <= target score: nothing in the right subtree can be higher.
             current = current->left;
         }
     }
 
-    // Store the rank of the player in result (1-based index)
-    result = count + 1;
-    return true;
+    return count + 1;
 }
 
 // Function to add in the vector , the players with rank in the range [a, b]

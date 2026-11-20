@@ -78,8 +78,8 @@ static Measurement runAVL(int n, const string& arrival, int run,
     long long localChecksum = 0;
     const auto rankStart = Clock::now();
     for (long long score : queryScores) {
-        const long long id = 1000000000LL + score;
-        if (tree.rank(id, score, rankResult)) localChecksum += rankResult;
+        rankResult = tree.rank(score);
+        localChecksum += rankResult;
     }
     const auto rankEnd = Clock::now();
 

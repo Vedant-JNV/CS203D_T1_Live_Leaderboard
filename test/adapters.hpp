@@ -1,7 +1,7 @@
 // adapters.hpp -- makes the teammates' two trees look the same to the tester.
 // Owner: Test owner.
 //
-// The trees have slightly different function signatures (AVL: rank(id,score,int&),
+// The trees have slightly different function signatures (AVL: rank(score),
 // select(k,Player&), range -> vector<Player>; BST: rank(score), select(k) -> -1 when
 // out of range, range -> vector<long long>, and range() clamps).  Instead of asking
 // anyone to change working code, each adapter wraps one tree and offers:
@@ -32,8 +32,8 @@ public:
     bool erase(PlayerId id, Score score)  { return impl.erase(id, score); }
 
     int rank(PlayerId id, Score score) const {
-        int r = 0;
-        return impl.rank(id, score, r) ? r : 0;
+        if (!impl.contains(id, score)) return 0;                // AVL::rank only takes the score
+        return impl.rank(score);
     }
     bool select(int k, PlayerId& out) const {
         AVL_Tree::Player p;
